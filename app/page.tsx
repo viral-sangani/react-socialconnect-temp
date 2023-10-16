@@ -1,20 +1,18 @@
 "use client";
-import { SCProviders, useSocialConnect } from "@/react-socialconnect/src/index";
-import { signIn, useSession } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import { useEffect } from "react";
+import { useSocialConnect } from "react-socialconnect";
 
 export default function Home() {
   const { data: session } = useSession();
-  const { registerIdentifier } = useSocialConnect(session, SCProviders.Github);
+  console.log("🚀 ~ file: page.tsx:9 ~ Home ~ session:", session);
+  const { registerIdentifier } = useSocialConnect();
 
   useEffect(() => {
     const register = async () => {
-      console.log("STARTED");
-      await registerIdentifier("0xE1061b397cC3C381E95a411967e3F053A7c50E70");
-      console.log("COMPLETED");
+      registerIdentifier();
     };
-
     if (session) {
       register();
     }
@@ -57,14 +55,30 @@ export default function Home() {
           priority
         />
       </div>
-      <button
-        className="bg-white px-3 py-1 rounded-xl text-black"
-        onClick={() => {
-          signIn();
-        }}
-      >
-        Connect Github
-      </button>
+      {session?.user ? (
+        <>
+          <button
+            className="bg-white px-3 py-1 rounded-xl text-black"
+            onClick={() => {
+              console.log("HERE");
+              signIn();
+            }}
+          >
+            Connect Github
+          </button>
+        </>
+      ) : (
+        <>
+          <button
+            className="bg-white px-3 py-1 rounded-xl text-black"
+            onClick={() => {
+              signOut();
+            }}
+          >
+            Disconnect
+          </button>
+        </>
+      )}
     </main>
   );
 }
